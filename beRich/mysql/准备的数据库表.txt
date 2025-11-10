@@ -1,0 +1,99 @@
+-- bian.symbol_entity definition
+
+
+
+CREATE TABLE `symbol_entity` (
+  `symbol` varchar(20) DEFAULT NULL,
+  `weight` int(1) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=212 DEFAULT CHARSET=utf8mb4;
+
+
+-- bian.kline_xian5m_entity definition
+
+CREATE TABLE `kline_u5m_entity` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `create_time` datetime DEFAULT NULL,
+  `flag_delete` bit(1) NOT NULL,
+  `open_price` decimal(20,8) NOT NULL,
+  `close_price` decimal(20,8) NOT NULL,
+  `open_time` datetime DEFAULT NULL,
+  `high_price` decimal(20,8) NOT NULL,
+  `low_price` decimal(20,8) NOT NULL,
+  `volume` varchar(50) NOT NULL,
+  `close_time` datetime DEFAULT NULL,
+  `volume_money` decimal(20,8) NOT NULL COMMENT '成交额',
+  `initiative_volume` varchar(50) NOT NULL,
+  `volume_number` bigint(20) NOT NULL,
+  `initiative_money` decimal(20,8) NOT NULL COMMENT '主动买入成交额',
+  `symbol` varchar(20) NOT NULL,
+  `percent` varchar(10) DEFAULT NULL,
+  `ema5` decimal(20,8) DEFAULT NULL,
+  `ema10` decimal(20,8) DEFAULT NULL,
+  `ema20` decimal(20,8) DEFAULT NULL,
+  `ema60` decimal(20,8) DEFAULT NULL,
+  `ema12` decimal(20,8) DEFAULT NULL,
+  `ema26` decimal(20,8) DEFAULT NULL,
+  `tr` decimal(20,8) DEFAULT NULL,
+  `atrl` decimal(20,8) DEFAULT NULL,
+  `atrs` decimal(20,8) DEFAULT NULL,
+  `zhengfu` varchar(10) DEFAULT NULL,
+  `ema30` decimal(20,8) DEFAULT NULL,
+  `bollup` decimal(20,8) DEFAULT NULL,
+  `bolldown` decimal(20,8) DEFAULT NULL,
+  `dif` decimal(20,8) DEFAULT NULL,
+  `dea` decimal(20,8) DEFAULT NULL,
+  `macd` decimal(20,8) DEFAULT NULL,
+  `pole_type` int(1) DEFAULT NULL,
+  `ema120` decimal(20,8) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6488768 DEFAULT CHARSET=utf8mb4;
+
+
+
+
+CREATE TABLE `kline_u1d_entity` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `create_time` datetime DEFAULT NULL,
+  `flag_delete` bit(1) NOT NULL,
+  `open_price` decimal(20,8) NOT NULL,
+  `close_price` decimal(20,8) NOT NULL,
+  `open_time` datetime DEFAULT NULL,
+  `high_price` decimal(20,8) NOT NULL,
+  `low_price` decimal(20,8) NOT NULL,
+  `volume` varchar(50) NOT NULL,
+  `close_time` datetime DEFAULT NULL,
+  `volume_money` decimal(20,8) NOT NULL COMMENT '成交额',
+  `initiative_volume` varchar(50) NOT NULL,
+  `volume_number` bigint(20) NOT NULL,
+  `initiative_money` decimal(20,8) NOT NULL COMMENT '主动买入成交额',
+  `symbol` varchar(20) NOT NULL,
+  `percent` varchar(10) DEFAULT NULL,
+  `ema5` decimal(20,8) DEFAULT NULL,
+  `ema10` decimal(20,8) DEFAULT NULL,
+  `ema20` decimal(20,8) DEFAULT NULL,
+  `ema60` decimal(20,8) DEFAULT NULL,
+  `ema12` decimal(20,8) DEFAULT NULL,
+  `ema26` decimal(20,8) DEFAULT NULL,
+  `tr` decimal(20,8) DEFAULT NULL,
+  `atrl` decimal(20,8) DEFAULT NULL,
+  `atrs` decimal(20,8) DEFAULT NULL,
+  `zhengfu` varchar(10) DEFAULT NULL,
+  `ema30` decimal(20,8) DEFAULT NULL,
+  `bollup` decimal(20,8) DEFAULT NULL,
+  `bolldown` decimal(20,8) DEFAULT NULL,
+  `dif` decimal(20,8) DEFAULT NULL,
+  `dea` decimal(20,8) DEFAULT NULL,
+  `macd` decimal(20,8) DEFAULT NULL,
+  `pole_type` int(1) DEFAULT NULL,
+  `ema120` decimal(20,8) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6488768 DEFAULT CHARSET=utf8mb4;
+
+
+`symbol_entity`  存放有哪些表
+`kline_u5m_entity`  表存放5m级别k线
+`kline_u1d_entity`  存放1d级别k线
+如果想要其他级别的k线，用相同的字段重新改名即可
+
