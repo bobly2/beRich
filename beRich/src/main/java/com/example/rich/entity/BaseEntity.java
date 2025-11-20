@@ -14,5 +14,4 @@ import java.util.Date;
 public class BaseEntity {
     private Long id;
     private Date createTime;
-    private Boolean flagDelete;
 }

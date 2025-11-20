@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.rich.mapper.u.BaseUMapper">
+
+    <!-- 查询所有用户 -->
+    <select id="getCountSymbol" resultType="int">
+        SELECT count(1) FROM symbol_entity
+    </select>
+
+    <select id="getKlienUList" resultType="com.example.rich.entity.u.KlineUEntity">
+        SELECT id,close_time,symbol FROM ${tableName} where symbol =#{symbol} order by open_time desc limit 2
+    </select>
+
+
+    <!-- 批量插入 KlineXianEntity -->
+    <insert id="insertListKlineUEntity" parameterType="java.util.List">
+        INSERT INTO ${tableName} (
+        open_price,
+        close_price,
+        open_time,
+        high_price,
+        low_price,
+        volume,
+        create_time,
+        close_time,
+        volume_money,
+        initiative_volume,
+        volume_number,
+        initiative_money,
+        symbol,
+        percent,
+        ema5,
+        ema10,
+        ema20,
+        ema60,
+        ema120,
+        bollup,
+        bolldown,
+        tr,
+        atrl,
+        atrs,
+        zhengfu,
+        ema12,
+        ema26,
+        dif,
+        dea,
+        macd,
+        pole_type
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.openPrice},
+            #{item.closePrice},
+            #{item.openTime},
+            #{item.highPrice},
+            #{item.lowPrice},
+            #{item.volume},
+            #{item.createTime},
+            #{item.closeTime},
+            #{item.volumeMoney},
+            #{item.initiativeVolume},
+            #{item.volumeNumber},
+            #{item.initiativeMoney},
+            #{item.symbol},
+            #{item.percent},
+            #{item.ema5},
+            #{item.ema10},
+            #{item.ema20},
+            #{item.ema60},
+            #{item.ema120},
+            #{item.bollup},
+            #{item.bolldown},
+            #{item.tr},
+            #{item.atrl},
+            #{item.atrs},
+            #{item.zhengfu},
+            #{item.ema12},
+            #{item.ema26},
+            #{item.dif},
+            #{item.dea},
+            #{item.macd},
+            #{item.poleType}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteById">
+        delete from ${tableName} where id=#{id}
+    </delete>
+</mapper>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.rich.mapper.u.BaseUMapper">
+
+    <!-- 查询所有用户 -->
+    <select id="getCountSymbol" resultType="int">
+        SELECT count(1) FROM symbol_entity
+    </select>
+
+    <select id="getKlienUList" resultType="com.example.rich.entity.u.KlineUEntity">
+        SELECT id,close_time,symbol FROM ${tableName} where symbol =#{symbol} order by open_time desc limit 2
+    </select>
+
+
+    <!-- 批量插入 KlineXianEntity -->
+    <insert id="insertListKlineUEntity" parameterType="java.util.List">
+        INSERT INTO ${tableName} (
+        open_price,
+        close_price,
+        open_time,
+        high_price,
+        low_price,
+        volume,
+        create_time,
+        close_time,
+        volume_money,
+        initiative_volume,
+        volume_number,
+        initiative_money,
+        symbol,
+        percent,
+        ema5,
+        ema10,
+        ema20,
+        ema60,
+        ema120,
+        bollup,
+        bolldown,
+        tr,
+        atrl,
+        atrs,
+        zhengfu,
+        ema12,
+        ema26,
+        dif,
+        dea,
+        macd,
+        pole_type
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.openPrice},
+            #{item.closePrice},
+            #{item.openTime},
+            #{item.highPrice},
+            #{item.lowPrice},
+            #{item.volume},
+            #{item.createTime},
+            #{item.closeTime},
+            #{item.volumeMoney},
+            #{item.initiativeVolume},
+            #{item.volumeNumber},
+            #{item.initiativeMoney},
+            #{item.symbol},
+            #{item.percent},
+            #{item.ema5},
+            #{item.ema10},
+            #{item.ema20},
+            #{item.ema60},
+            #{item.ema120},
+            #{item.bollup},
+            #{item.bolldown},
+            #{item.tr},
+            #{item.atrl},
+            #{item.atrs},
+            #{item.zhengfu},
+            #{item.ema12},
+            #{item.ema26},
+            #{item.dif},
+            #{item.dea},
+            #{item.macd},
+            #{item.poleType}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteById">
+        delete from ${tableName} where id=#{id}
+    </delete>
+
+
+
+
+    <update id="updateListKlineUEntity">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE ${tableName}
+            <set>
+                <if test="item.openPrice != null">open_price = #{item.openPrice},</if>
+                <if test="item.closePrice != null">close_price = #{item.closePrice},</if>
+                <if test="item.openTime != null">open_time = #{item.openTime},</if>
+                <if test="item.highPrice != null">high_price = #{item.highPrice},</if>
+                <if test="item.lowPrice != null">low_price = #{item.lowPrice},</if>
+                <if test="item.volume != null">volume = #{item.volume},</if>
+                <if test="item.createTime != null">create_time = #{item.createTime},</if>
+                <if test="item.closeTime != null">close_time = #{item.closeTime},</if>
+                <if test="item.volumeMoney != null">volume_money = #{item.volumeMoney},</if>
+                <if test="item.initiativeVolume != null">initiative_volume = #{item.initiativeVolume},</if>
+                <if test="item.volumeNumber != null">volume_number = #{item.volumeNumber},</if>
+                <if test="item.initiativeMoney != null">initiative_money = #{item.initiativeMoney},</if>
+                <if test="item.symbol != null and item.symbol != ''">symbol = #{item.symbol},</if>
+                <if test="item.percent != null and item.percent != ''">percent = #{item.percent},</if>
+                <if test="item.ema5 != null">ema5 = #{item.ema5},</if>
+                <if test="item.ema10 != null">ema10 = #{item.ema10},</if>
+                <if test="item.ema20 != null">ema20 = #{item.ema20},</if>
+                <if test="item.ema60 != null">ema60 = #{item.ema60},</if>
+                <if test="item.ema120 != null">ema120 = #{item.ema120},</if>
+                <if test="item.bollup != null">bollup = #{item.bollup},</if>
+                <if test="item.bolldown != null">bolldown = #{item.bolldown},</if>
+                <if test="item.tr != null">tr = #{item.tr},</if>
+                <if test="item.atrl != null">atrl = #{item.atrl},</if>
+                <if test="item.atrs != null">atrs = #{item.atrs},</if>
+                <if test="item.zhengfu != null and item.zhengfu != ''">zhengfu = #{item.zhengfu},</if>
+                <if test="item.ema12 != null">ema12 = #{item.ema12},</if>
+                <if test="item.ema26 != null">ema26 = #{item.ema26},</if>
+                <if test="item.dif != null">dif = #{item.dif},</if>
+                <if test="item.dea != null">dea = #{item.dea},</if>
+                <if test="item.macd != null">macd = #{item.macd},</if>
+                <if test="item.poleType != null and item.poleType != ''">pole_type = #{item.poleType},</if>
+            </set>
+            WHERE id = #{item.id}
+        </foreach>
+    </update>
+</mapper>

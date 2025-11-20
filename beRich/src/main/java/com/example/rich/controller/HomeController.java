@@ -1,6 +1,8 @@
 package com.example.rich.controller;
 
+import com.example.rich.service.BaseDataService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -14,9 +16,17 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequestMapping("/api")
 public class HomeController {
+    @Autowired
+    private BaseDataService baseDataService;
     @GetMapping("/test")
     @CrossOrigin
     public String test() {
+        return "success";
+    }
+    @GetMapping("/init")
+    @CrossOrigin
+    public String initData() {
+        baseDataService.initKlineUList("ZECUSDT");
         return "success";
     }
 

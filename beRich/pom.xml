@@ -32,7 +32,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>io.github.binance</groupId>-->
@@ -43,6 +42,11 @@
             <groupId>io.github.binance</groupId>
             <artifactId>binance-futures-connector-java</artifactId>
             <version>3.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.13</version>
         </dependency>
         <!--webSocket-->
 <!--        <dependency>-->
@@ -91,6 +95,7 @@
             <artifactId>poi-contrib</artifactId>
             <version>3.6</version>
         </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml-schemas -->
         <dependency>
             <groupId>org.apache.poi</groupId>
@@ -132,6 +137,7 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.1.0</version>
             </plugin>
+
 
             <!--            <plugin>
                             <groupId>org.apache.maven.plugins</groupId>

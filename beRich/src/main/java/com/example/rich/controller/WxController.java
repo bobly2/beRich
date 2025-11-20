@@ -3,11 +3,13 @@ package com.example.rich.controller;
 import com.example.rich.config.urlconfig.XianUrlConfig;
 import com.example.rich.dto.wx.TextMessage;
 import com.example.rich.dto.wx.WxMessage;
-import com.example.rich.service.BaseService;
+
 import com.example.rich.utils.WeiXinPublicUtils;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,8 +28,7 @@ import java.util.Map;
 public class WxController {
     @Autowired
     private WeiXinPublicUtils weiXinPublicUtils;
-    @Autowired
-    private BaseService baseService;
+
 
 
     @PostMapping("/verify")

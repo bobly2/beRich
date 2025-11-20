@@ -5,6 +5,6 @@ import lombok.Data;
 
 
 @Data
-public class KlineU1dEntity extends KlineXianEntity {
+public class KlineUEntity extends KlineXianEntity {
 
 }
