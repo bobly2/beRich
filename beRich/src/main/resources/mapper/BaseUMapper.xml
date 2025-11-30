@@ -10,7 +10,7 @@
         SELECT count(1) FROM symbol_entity
     </select>
 
-    <select id="getKlienUList" resultType="com.example.rich.entity.u.KlineUEntity">
+    <select id="getKlienUListForAdd" resultType="com.example.rich.entity.u.KlineUEntity">
         SELECT id,close_time,symbol FROM ${tableName} where symbol =#{symbol} order by open_time desc limit 2
     </select>
 
@@ -133,4 +133,18 @@
             WHERE id = #{item.id}
         </foreach>
     </update>
+
+    <select id="getAllByTime" resultType="com.example.rich.entity.u.KlineUEntity">
+        SELECT * FROM ${tableName}
+        WHERE symbol = #{symbol}
+        <if test="startTime != null">
+            AND open_time >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND open_time &lt;= #{endTime}
+        </if>
+        ORDER BY open_time asc
+    </select>
+
+
 </mapper>

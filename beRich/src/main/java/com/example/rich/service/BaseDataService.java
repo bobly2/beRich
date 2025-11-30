@@ -7,6 +7,7 @@ import java.util.List;
 public interface BaseDataService {
     void initKlineUList(String symbol);
 
-    void updateKlineUList(String symbol);
+    void updateKlineUList(String table, List<KlineUEntity> list);
 
+    void updateEma2060(String symbol,String table);
 }

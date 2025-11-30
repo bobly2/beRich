@@ -46,7 +46,7 @@ public class BaseDataServiceImpl implements BaseDataService {
     @Override
     public void initKlineUList(String symbol) {
         String tableName = TableNameEnum.m5.getTableName();
-        List<KlineUEntity>  list = baseUMapper.getKlienUList(TableNameEnum.m5.getTableName(), symbol);
+        List<KlineUEntity>  list = baseUMapper.getKlienUListForAdd(TableNameEnum.m5.getTableName(), symbol);
         if(CollectionUtils.isEmpty(list)){
             Long startTime = 1735660800000L;//2025-01-01 00:00:00
             String url = this.setKlineUrlByParam(symbol, KLineIntervalEnums.m5.getInterval(), startTime);
@@ -65,8 +65,8 @@ public class BaseDataServiceImpl implements BaseDataService {
         }
     }
 
-    public void updateKlineUList(String symbol) {
-
+    public void updateKlineUList(String table, List<KlineUEntity> list) {
+        baseUMapper.updateListKlineUEntity(table,list);
     }
 
     private String setKlineUrlByParam(String symbol, String interval, Long startTime) {
@@ -136,7 +136,7 @@ public class BaseDataServiceImpl implements BaseDataService {
 
 
     public void updateEma2060(String symbol,String table) {
-        List<KlineUEntity> list =xianService.getListByType(symbol, "1h");
+        List<KlineUEntity> list =baseUMapper.getAllByTime(table, symbol,null,null);
         BigDecimal ema20 = list.get(0).getClosePrice();
         BigDecimal ema60 = list.get(0).getClosePrice();
         for (int i = 0; i < list.size() - 1; i++) {
@@ -148,7 +148,7 @@ public class BaseDataServiceImpl implements BaseDataService {
         }
         List<List<KlineUEntity>> listmaps = Lists.partition(list, 300);
         for (int i = 0; i < listmaps.size(); i++) {
-            baseUMapper.updateListKlineUEntity(table, listmaps.get(i),symbol);
+            baseUMapper.updateListKlineUEntity(table, listmaps.get(i));
             System.out.println(symbol+":success:" + i);
         }
     }
