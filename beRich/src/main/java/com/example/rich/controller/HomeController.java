@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequestMapping("/api")
 public class HomeController {
-    @Autowired
+    @Autowired(required = true)
     private BaseDataService baseDataService;
     @GetMapping("/test")
     @CrossOrigin

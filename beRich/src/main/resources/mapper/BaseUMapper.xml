@@ -146,5 +146,11 @@
         ORDER BY open_time asc
     </select>
 
+    <select id="getFirstNoEma" resultType="com.example.rich.entity.u.KlineUEntity">
+        SELECT * FROM ${tableName}
+        WHERE symbol = #{symbol}
+        and ema20 is not null
+        ORDER BY close_time desc limit 1
+    </select>
 
 </mapper>

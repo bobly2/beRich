@@ -26,7 +26,7 @@ public class BaseDataInit {
 
     @Test
     public void initData() throws ParseException, InterruptedException {
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 1; i++) {
             String symbol = "ZECUSDT";
             baseDataService.initKlineUList(symbol);
             System.out.println("进度:"+i);
@@ -48,7 +48,7 @@ public class BaseDataInit {
     public void lixiang() throws ParseException {
         String tableName = TableNameEnum.m5.getTableName();
         String symbol = "ZECUSDT";
-        baseDataService.updateEma2060(symbol,tableName);
+        baseDataService.updateMACD(symbol,tableName);
         //List<KlineUEntity> list =  baseUMapper.getBySymbol(tableName,symbol,null,null);
 //        for (int i = 0; i < list.size(); i++){
 //            KlineUEntity en = list.get(i);

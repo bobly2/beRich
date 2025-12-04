@@ -1,12 +1,11 @@
 package com.example.rich;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 import com.example.rich.entity.u.KlineUEntity;
 import com.example.rich.enums.TableNameEnum;
-import com.example.rich.mapper.u.BaseUMapper;
-import com.example.rich.service.BaseDataService;
+
 import com.example.rich.service.GetDataService;
-import com.example.rich.service.impl.BaseDataServiceImpl;
+
 import com.example.rich.utils.ComputeUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,7 @@ public class Trr {
     private GetDataService getDataService;
     @Autowired
     private ComputeUtils computeUtils;
+
     @Test
     public void huicai2( ) throws ParseException {
         String tableName = TableNameEnum.m5.getTableName();

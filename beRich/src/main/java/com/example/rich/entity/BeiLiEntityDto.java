@@ -1,5 +1,6 @@
 package com.example.rich.entity;
 
+import com.example.rich.entity.u.KlineUEntity;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -16,6 +17,10 @@ public class BeiLiEntityDto {
     private Date firstDate;
     private Date secondDate;
     private Date thirdDate;
+
+    private KlineUEntity startEn;
+    private BigDecimal HighPrice;
+    private BigDecimal LowPrice;
 }
 
 

@@ -30,17 +30,31 @@ public class LiXiangTest {
 
 
     //30%   20次
-    //策略1  目标 ：   盈亏1：1 ，胜率   80% ， 短线操作   基于5m ,符合所有币种
+    //策略1  目标 ：   盈亏1：1 ，胜率   80% ， 短线操作   基于5m ,符合所有币种  155次
     @Test
     public void lixiang() throws ParseException {
+
+      //  rent1201();
+
         BigDecimal benjin = new BigDecimal("100");
         String str = "1.5%";
-        for (int i = 1; i < 120; i++) {
+        for (int i = 1; i < 200; i++) {
             benjin = computeUtils.countPercent(str, benjin);
             System.out.println("第" + i + "次,本金:" + benjin);
         }
         // 15次 1% 一次 6%
         //第119次,本金:588.1098
+    }
+    public void rent1201(){
+        double meiTuan =26485.94d;
+        double wangShang=55000.03d;
+        double lenovo = 11000d;
+        double huaBei = 1695.57d;
+        double jd = 5000d;
+        double zhaoShang = 1377.79d;
+        double all = meiTuan+wangShang+lenovo+huaBei+jd+zhaoShang;
+        double month = 4574.19d+5000d+1695.67d+5964.82d+1377.79d;
+        System.out.println("all:"+all +","+"month:"+month);
     }
 
     //25.38%  21.71%

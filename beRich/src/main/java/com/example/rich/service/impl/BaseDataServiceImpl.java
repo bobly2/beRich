@@ -19,8 +19,8 @@ import org.springframework.util.CollectionUtils;
 
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -46,27 +46,27 @@ public class BaseDataServiceImpl implements BaseDataService {
     @Override
     public void initKlineUList(String symbol) {
         String tableName = TableNameEnum.m5.getTableName();
-        List<KlineUEntity>  list = baseUMapper.getKlienUListForAdd(TableNameEnum.m5.getTableName(), symbol);
-        if(CollectionUtils.isEmpty(list)){
+        List<KlineUEntity> list = baseUMapper.getKlienUListForAdd(TableNameEnum.m5.getTableName(), symbol);
+        if (CollectionUtils.isEmpty(list)) {
             Long startTime = 1735660800000L;//2025-01-01 00:00:00
             String url = this.setKlineUrlByParam(symbol, KLineIntervalEnums.m5.getInterval(), startTime);
             String str = getDatas(url);
 
-            List<KlineUEntity> dtos = constrctK(str,symbol);
+            List<KlineUEntity> dtos = constrctK(str, symbol);
             baseUMapper.insertListKlineUEntity(tableName, dtos);
-        }else{
-            baseUMapper.deleteById(tableName,list.get(0).getId());
+        } else {
+            baseUMapper.deleteById(tableName, list.get(0).getId());
             KlineUEntity en = list.get(1);
             Long startTime = en.getCloseTime().getTime();
             String url = this.setKlineUrlByParam(symbol, KLineIntervalEnums.m5.getInterval(), startTime);
             String str = getDatas(url);
-            List<KlineUEntity> dtos = constrctK(str,symbol);
+            List<KlineUEntity> dtos = constrctK(str, symbol);
             baseUMapper.insertListKlineUEntity(tableName, dtos);
         }
     }
 
     public void updateKlineUList(String table, List<KlineUEntity> list) {
-        baseUMapper.updateListKlineUEntity(table,list);
+        baseUMapper.updateListKlineUEntity(table, list);
     }
 
     private String setKlineUrlByParam(String symbol, String interval, Long startTime) {
@@ -85,16 +85,11 @@ public class BaseDataServiceImpl implements BaseDataService {
 
 
     public String getDatas(String url) {
-        String str = null;
-        try {
-            str = httpHelperUtils.getMethods2(url);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        String str = httpHelperUtils.getMethods2(url);
         return str;
     }
 
-    public List<KlineUEntity> constrctK(String str,String symbol)  {
+    public List<KlineUEntity> constrctK(String str, String symbol) {
         List<List<String>> list = null;
         try {
             list = objectMapper.readValue(str, List.class);
@@ -134,22 +129,77 @@ public class BaseDataServiceImpl implements BaseDataService {
     }
 
 
-
-    public void updateEma2060(String symbol,String table) {
-        List<KlineUEntity> list =baseUMapper.getAllByTime(table, symbol,null,null);
+    public void updateEma2060(String symbol, String table) {
+        List<KlineUEntity> list = baseUMapper.getAllByTime(table, symbol, null, null);
         BigDecimal ema20 = list.get(0).getClosePrice();
         BigDecimal ema60 = list.get(0).getClosePrice();
         for (int i = 0; i < list.size() - 1; i++) {
             KlineUEntity e = list.get(i);
-            ema20 = computeUtils.getEMASca(e.getClosePrice(), e.getOpenPrice(),ema20, 20);
+            ema20 = computeUtils.getEMASca(e.getClosePrice(), e.getOpenPrice(), ema20, 20);
             e.setEma20(ema20);
-            ema60 = computeUtils.getEMASca(e.getClosePrice(),e.getOpenPrice(), ema60, 60);
+            ema60 = computeUtils.getEMASca(e.getClosePrice(), e.getOpenPrice(), ema60, 60);
             e.setEma60(ema60);
         }
         List<List<KlineUEntity>> listmaps = Lists.partition(list, 300);
         for (int i = 0; i < listmaps.size(); i++) {
             baseUMapper.updateListKlineUEntity(table, listmaps.get(i));
-            System.out.println(symbol+":success:" + i);
+            System.out.println(symbol + ":success:" + i);
+        }
+    }
+
+    @Override
+    public void updateMACD(String symbol, String table) {
+        List<KlineUEntity> list = baseUMapper.getAllByTime(table, symbol, null, null);
+        if (!CollectionUtils.isEmpty(list)) {
+            BigDecimal ema20 = list.get(0).getEma20();
+            BigDecimal ema60 = list.get(0).getEma60();
+            BigDecimal ema12 = list.get(0).getEma12();
+            BigDecimal ema26 = list.get(0).getEma26();
+            BigDecimal lastDea = list.get(0).getDea();
+
+            if (ema20 == null) {
+                ema20 = list.get(0).getClosePrice();
+            }
+            if (ema60 == null) {
+                ema60 = list.get(0).getClosePrice();
+            }
+            if (ema12 == null) {
+                ema12 = list.get(0).getClosePrice();
+            }
+            if (ema26 == null) {
+                ema26 = list.get(0).getClosePrice();
+            }
+
+            for (int i = 0; i < list.size(); i++) {
+                KlineUEntity e = list.get(i);
+                try {
+                    ema20 = computeUtils.getEMASca(e.getClosePrice(), e.getOpenPrice(), ema20, 20);
+                    e.setEma20(ema20);
+                    ema60 = computeUtils.getEMASca(e.getClosePrice(), e.getOpenPrice(), ema60, 60);
+                    e.setEma60(ema60);
+                    ema12 = computeUtils.getEMASca(e.getClosePrice(), e.getOpenPrice(), ema12, 12);
+                    e.setEma12(ema12);
+                    ema26 = computeUtils.getEMASca(e.getClosePrice(), e.getOpenPrice(), ema26, 26);
+                    e.setEma26(ema26);
+
+                    e.setDif(computeUtils.subs(ema26, ema12));
+                    if (lastDea == null) {
+                        lastDea = e.getDif();
+                    }
+                    lastDea = computeUtils.getDEA(e.getDif(), lastDea);
+                    e.setDea(lastDea);
+                    BigDecimal macd = computeUtils.subs(e.getDif(), lastDea).multiply(new BigDecimal("2")).setScale(4, RoundingMode.HALF_UP);
+                    e.setMacd(macd);
+                } catch (Exception ee) {
+                    System.out.println("error:" + e.getId());
+                }
+            }
+            List<List<KlineUEntity>> listmaps = Lists.partition(list, 100);
+            for (int i = 0; i < listmaps.size(); i++) {
+                baseUMapper.updateListKlineUEntity(table, listmaps.get(i));
+                System.out.println("success:" + i);
+
+            }
         }
     }
 }

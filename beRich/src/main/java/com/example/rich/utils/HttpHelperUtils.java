@@ -2,25 +2,24 @@ package com.example.rich.utils;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpHost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+
 
 /**
  * @Author: SC19002999
@@ -36,8 +35,8 @@ public class HttpHelperUtils {
 
     public <T, TR> String postForMy(String url, TR request) throws JsonProcessingException {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(60*1000);// 设置超时
-        requestFactory.setReadTimeout(60*1000);
+        requestFactory.setConnectTimeout(60 * 1000);// 设置超时
+        requestFactory.setReadTimeout(60 * 1000);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON_UTF8);
@@ -57,21 +56,15 @@ public class HttpHelperUtils {
         return result;
     }
 
-    public String getMethods(String url) throws JsonProcessingException {
-        System.out.println("----:"+url);
+    public String getMethods(String url) {
         RestTemplate restTemplate = new RestTemplate();
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("localhost", 7897)));
+        restTemplate.setRequestFactory(requestFactory);
         return restTemplate.getForObject(url, String.class);
     }
 
-    public String getMethods2(String url) throws JsonProcessingException {
-         CloseableHttpClient httpClient = HttpClientBuilder.create()
-                .setProxy(new HttpHost("localhost", 7897))
-                .build();
-        HttpComponentsClientHttpRequestFactory factory =
-                new HttpComponentsClientHttpRequestFactory(httpClient);
-
-        RestTemplate restTemplate = new RestTemplate(factory);
-        return restTemplate.getForObject(url, String.class);
-
+    public String getMethods2(String url) {
+        return getMethods(url);
     }
 }

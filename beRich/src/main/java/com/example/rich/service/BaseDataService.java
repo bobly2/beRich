@@ -10,4 +10,6 @@ public interface BaseDataService {
     void updateKlineUList(String table, List<KlineUEntity> list);
 
     void updateEma2060(String symbol,String table);
+
+    void updateMACD(String symbol,String table);
 }

@@ -23,4 +23,6 @@ public interface BaseUMapper {
     int updateListKlineUEntity(@Param("tableName") String tableName,@Param("list")  List<KlineUEntity> list);
 
     List<KlineUEntity> getAllByTime(@Param("tableName") String tableName, @Param("symbol") String symbol, @Param("startTime") Date startTime, @Param("endTime") Date endTime);
+
+    List<KlineUEntity> getFirstNoEma(@Param("tableName") String tableName, @Param("symbol") String symbol);
 }

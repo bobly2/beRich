@@ -3,6 +3,10 @@ package com.example.rich.utils;
 
 import com.example.rich.dto.wx.WxMessage;
 import com.thoughtworks.xstream.XStream;
+import jakarta.mail.*;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -11,10 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpServletRequest;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
@@ -50,9 +51,9 @@ public class WeiXinPublicUtils {
         // 构建授权信息，用于进行SMTP进行身份验证
         Authenticator authenticator = new Authenticator() {
             @Override
-            protected javax.mail.PasswordAuthentication getPasswordAuthentication() {
+            protected PasswordAuthentication getPasswordAuthentication() {
                 // 用户名、密码
-                return new javax.mail.PasswordAuthentication("xx", "xx");
+                return new PasswordAuthentication("xx", "xx");
             }
         };
         // 使用环境属性和授权信息，创建邮件会话

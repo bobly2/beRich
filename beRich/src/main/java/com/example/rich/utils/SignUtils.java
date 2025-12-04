@@ -1,6 +1,7 @@
 package com.example.rich.utils;
 
 import com.example.rich.entity.BeiLiEntityDto;
+import com.example.rich.entity.u.KlineUEntity;
 import com.example.rich.entity.xian.KlineXianEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 //http://www.danglanglang.com/gupiao/2969
 
 /**
@@ -246,12 +248,330 @@ public class SignUtils {
         return false;
     }
 
+    //1.4h或者1h上的支撑与阻力
+    //2. 在15m或者5m级别出现反转信号
+    //3.123法则，2b入场
+
+    public BeiLiEntityDto flagBeili(List<KlineUEntity> list) {
+        BeiLiEntityDto dto = new BeiLiEntityDto();
+        KlineUEntity elast0 = list.get(list.size() - 1);
+        KlineUEntity elast1 = list.get(list.size() - 2);//假设为第二个极高点
+        KlineUEntity elast2 = list.get(list.size() - 3);
+        KlineUEntity elast3 = list.get(list.size() - 4);
+        KlineUEntity elast4 = list.get(list.size() - 5);
+        KlineUEntity elast5 = list.get(list.size() - 6);
+        int poleType3 = 0;
+        if (computeUtils.getFlagDaYu(elast1.getHighPrice(), elast0.getHighPrice())
+                && computeUtils.getFlagDaYu(elast1.getHighPrice(), elast2.getHighPrice())
+                && computeUtils.getFlagDaYu(elast1.getHighPrice(), elast3.getHighPrice())
+                && computeUtils.getFlagDaYu(elast1.getHighPrice(), elast4.getHighPrice())
+                && computeUtils.getFlagDaYu(elast1.getHighPrice(), elast5.getHighPrice())) {
+            poleType3 = 2;
+        }
+
+        int poleType2 = 0;
+        KlineUEntity eMid = new KlineUEntity();
+        if (poleType3 == 2) {
+            //寻找中间极低点
+            for (int i = 4; i < list.size() - 9; i++) {
+                KlineUEntity e8 = list.get(i + 8);
+                KlineUEntity e7 = list.get(i + 7);
+                KlineUEntity e6 = list.get(i + 6);
+                KlineUEntity e5 = list.get(i + 5);
+
+                KlineUEntity e4 = list.get(i + 4);//中间的极点
+
+                KlineUEntity e3 = list.get(i + 3);
+                KlineUEntity e2 = list.get(i + 2);
+                KlineUEntity e1 = list.get(i + 1);
+                KlineUEntity e0 = list.get(i);
+
+                if (computeUtils.getFlagDaYu(e0.getLowPrice(), e4.getLowPrice()) &&
+                        computeUtils.getFlagDaYu(e1.getLowPrice(), e4.getLowPrice()) &&
+                        computeUtils.getFlagDaYu(e2.getLowPrice(), e4.getLowPrice()) &&
+                        computeUtils.getFlagDaYu(e3.getLowPrice(), e4.getLowPrice()) &&
+                        computeUtils.getFlagDaYu(e5.getLowPrice(), e4.getLowPrice()) &&
+                        computeUtils.getFlagDaYu(e6.getLowPrice(), e4.getLowPrice()) &&
+                        computeUtils.getFlagDaYu(e7.getLowPrice(), e4.getLowPrice()) &&
+                        computeUtils.getFlagDaYu(e8.getLowPrice(), e4.getLowPrice())
+                ) {
+                    eMid = e4;
+                    poleType2 = 1;
+                }
+            }
+        }
+        int poleType1 = 0;
+        KlineUEntity eFirst = new KlineUEntity();
+
+        if (poleType3 == 2 && poleType2 == 1) {
+            //寻找第一个极高点
+            for (int i = 0; i < list.size() - 13; i++) {
+                KlineUEntity e8 = list.get(i + 3);
+                KlineUEntity e7 = list.get(i + 3);
+                KlineUEntity e6 = list.get(i + 3);
+                KlineUEntity e5 = list.get(i + 3);
+
+                KlineUEntity e4 = list.get(i + 4);//第一个极点
+
+                KlineUEntity e3 = list.get(i + 3);
+                KlineUEntity e2 = list.get(i + 2);
+                KlineUEntity e1 = list.get(i + 1);
+                KlineUEntity e0 = list.get(i);
 
 
+                //e3的dif 极高点
+                if (computeUtils.getFlagDaYu(e4.getHighPrice(), e2.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e4.getHighPrice(), e1.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e4.getHighPrice(), e0.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e4.getHighPrice(), e3.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e4.getHighPrice(), e5.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e4.getHighPrice(), e6.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e4.getHighPrice(), e7.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e4.getHighPrice(), e8.getHighPrice())
+                ) {
+                    poleType1 = 3;
+                    eFirst = e4;
+                }
+
+                Long l1 = e3.getOpenTime().getTime();
+                Long l2 = elast1.getOpenTime().getTime();
+                long diff = (l2 - l1) / (60000);
+
+                if (computeUtils.getFlagDaYu(elast1.getHighPrice(), e3.getHighPrice())
+                        && diff > 40
+                        && computeUtils.getFlagDaYu(elast1.getVolumeMoney(), elast2.getVolumeMoney())
+                        && computeUtils.getFlagDaYu(elast2.getVolumeMoney(), elast3.getVolumeMoney())
+                ) {
+
+                    //出现顶背离
+
+                    //String percent = computeUtils.getPercent(list.get(list.size() - 1).getClosePrice(), elast0.getClosePrice());
+//                        dto.setPercent(percent);
+//                        System.out.println("第一个点时间：" + computeUtils.dateToString(e3.getOpenTime())
+//                                + ",第二个点时间：" + computeUtils.dateToString(elast1.getOpenTime()));
+                }
+
+                if (poleType1 == 3
+                        && computeUtils.getFlagDaYu(eFirst.getClosePrice(), elast1.getClosePrice())
+                ) {
+                    dto.setSymbol(e3.getSymbol());
+                    dto.setType("出现M顶");
+                    dto.setNowprice(list.get(list.size() - 1).getClosePrice());
+                    dto.setStartDate(elast1.getOpenTime());
+
+                    dto.setFirstDate(eFirst.getOpenTime());
+                    dto.setThirdDate(elast1.getOpenTime());
+                    dto.setSecondDate(eMid.getOpenTime());
+//                    System.out.println("第一个极高点时间：" + computeUtils.dateToString(eFirst.getOpenTime())
+//                            + ",第二极高点时间：" + computeUtils.dateToString(elast1.getOpenTime()));
+                }
+
+//                String percent = computeUtils.getPercent(list.get(list.size() - 1).getClosePrice(), elast0.getClosePrice());
+//                dto.setPercent(percent);
+
+            }
+        }
+        return dto;
+    }
+
+    public BeiLiEntityDto flagBeiliNew(List<KlineUEntity> list) {
+        List<KlineUEntity> sortList = list.stream()
+                .sorted((entity1, entity2) ->
+                        entity2.getClosePrice().compareTo(entity1.getClosePrice()))
+                .collect(Collectors.toList());
+        //理论上  第最高点在最后
+        KlineUEntity top1 = sortList.get(0);
+        KlineUEntity top2 = sortList.get(1);
+        KlineUEntity low1 = sortList.get(list.size() - 1);
+        BeiLiEntityDto beiliEn = new BeiLiEntityDto();
+        if (top1.getCloseTime().getTime() > low1.getCloseTime().getTime() && low1.getCloseTime().getTime() > top2.getCloseTime().getTime()) {
+            if (computeUtils.getFlagDaYu(top2.getDea(), top1.getDea()) && computeUtils.getFlagDaYu(top1.getHighPrice(), top2.getHighPrice())) {
+                KlineUEntity en = list.get(list.size() - 1);
+                beiliEn.setStartEn( en);
+                beiliEn.setHighPrice(top1.getHighPrice());
+                beiliEn.setLowPrice(low1.getLowPrice());
+
+                System.out.println("背离:" + "第一个顶点：" + computeUtils.dateToString(top1.getCloseTime())
+                        + ",中间低点：" + computeUtils.dateToString(low1.getCloseTime())
+                        + ",第二个顶点：" + computeUtils.dateToString(top2.getCloseTime())
+                        + ",识别时间：" + computeUtils.dateToString(list.get(list.size() - 1).getCloseTime())
+                        + ",入场价格："+ list.get(list.size() - 1).getClosePrice()
+                );
+                return beiliEn;
+            }
+        }
+        return null;
+    }
+
+    //背离，或者说m顶，关键的是找到极点！
+    public BeiLiEntityDto flagBeili2(List<KlineUEntity> list) {
 
 
+        BeiLiEntityDto dto = new BeiLiEntityDto();
+        KlineUEntity elast0 = list.get(list.size() - 1);
+        KlineUEntity elast1 = list.get(list.size() - 2);//假设为第二个极点
+        KlineUEntity elast2 = list.get(list.size() - 3);
+        KlineUEntity elast3 = list.get(list.size() - 4);
+        KlineUEntity elast4 = list.get(list.size() - 5);
+        int poleType2 = 0;
+        if (elast2.getDif() == null) {
+            elast2.setDif(elast2.getClosePrice());
+        }
+        if (computeUtils.getFlagDaYu(elast1.getHighPrice(), elast0.getHighPrice())
+                && computeUtils.getFlagDaYu(elast1.getHighPrice(), elast2.getHighPrice())
+                && computeUtils.getFlagDaYu(elast1.getHighPrice(), elast3.getHighPrice())
+                && computeUtils.getFlagDaYu(elast1.getHighPrice(), elast4.getHighPrice())
+        ) {
+            poleType2 = 2;
+        }
+        //顶背离
+        if (poleType2 == 2) {
+            //寻找第一个极高点
+            for (int i = 0; i < list.size() - 11; i++) {
+                KlineUEntity e7 = list.get(i + 7);
+                KlineUEntity e6 = list.get(i + 6);
+                KlineUEntity e5 = list.get(i + 5);
+                KlineUEntity e4 = list.get(i + 4);
+                KlineUEntity e3 = list.get(i + 3);//第一个极点
+                KlineUEntity e2 = list.get(i + 2);
+                KlineUEntity e1 = list.get(i + 1);
+                KlineUEntity e0 = list.get(i);
+//                //e3的dif 极高点
+//                if (computeUtils.getFlagDaYu(e3.getDif(), e2.getDif()) &&
+//                        computeUtils.getFlagDaYu(e3.getDif(), e1.getDif()) &&
+//                        computeUtils.getFlagDaYu(e3.getDif(), e0.getDif()) &&
+//                        computeUtils.getFlagDaYu(e3.getDif(), e4.getDif()) &&
+//                        computeUtils.getFlagDaYu(e3.getDif(), e5.getDif()) &&
+//                        computeUtils.getFlagDaYu(e3.getDif(), e6.getDif())) {
+                if (e0.getDif() == null) {
+                    e0.setDif(e0.getClosePrice());
+                }
+                //e3的dif 极高点
+                if (computeUtils.getFlagDaYu(e3.getHighPrice(), e2.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e3.getHighPrice(), e1.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e3.getHighPrice(), e0.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e3.getHighPrice(), e4.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e3.getHighPrice(), e5.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e3.getHighPrice(), e6.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e3.getHighPrice(), e7.getHighPrice())
+                        &&
+                        computeUtils.getFlagDaYu(e3.getDif(), e2.getDif()) &&
+                        computeUtils.getFlagDaYu(e3.getDif(), e1.getDif()) &&
+                        computeUtils.getFlagDaYu(e3.getDif(), e0.getDif()) &&
+                        computeUtils.getFlagDaYu(e3.getDif(), e4.getDif()) &&
+                        computeUtils.getFlagDaYu(e3.getDif(), e5.getDif()) &&
+                        computeUtils.getFlagDaYu(e3.getDif(), e6.getDif()) &&
+                        computeUtils.getFlagDaYu(e3.getDif(), e7.getDif())
+                ) {
+                    Long l1 = e3.getOpenTime().getTime();
+                    Long l2 = elast1.getOpenTime().getTime();
+                    long diff = (l2 - l1) / (60000);
+                    if (computeUtils.getFlagDaYu(e3.getDif(), elast1.getDif())
+                            && computeUtils.getFlagDaYu(elast1.getHighPrice(), e3.getHighPrice())
+                            && diff > 15) {
+                        //出现顶背离
+                        dto.setSymbol(e3.getSymbol());
+                        dto.setType("顶背离");
+                        //String percent = computeUtils.getPercent(list.get(list.size() - 1).getClosePrice(), elast0.getClosePrice());
+//                        dto.setPercent(percent);
+                        System.out.println("第一个点时间：" + computeUtils.dateToString(e3.getOpenTime())
+                                + ",第二个点时间：" + computeUtils.dateToString(elast1.getOpenTime()));
+                    }
+                }
+            }
+        }
+        return dto;
+    }
+
+    public BeiLiEntityDto flagBeilih(List<KlineUEntity> list) {
+        BeiLiEntityDto dto = new BeiLiEntityDto();
+        KlineUEntity elast0 = list.get(list.size() - 1);
+        KlineUEntity elast1 = list.get(list.size() - 2);//假设为第二个极点
+        KlineUEntity elast2 = list.get(list.size() - 3);
+        KlineUEntity elast3 = list.get(list.size() - 4);
+        KlineUEntity elast4 = list.get(list.size() - 5);
+        int poleType2 = 0;
+        if (elast2.getDif() == null) {
+            elast2.setDif(elast2.getClosePrice());
+        }
+        if (computeUtils.getFlagDaYu(elast1.getHighPrice(), elast0.getHighPrice())
+                && computeUtils.getFlagDaYu(elast1.getHighPrice(), elast2.getHighPrice())
+                && computeUtils.getFlagDaYu(elast1.getHighPrice(), elast3.getHighPrice())
+                && computeUtils.getFlagDaYu(elast1.getHighPrice(), elast4.getHighPrice())
+                && computeUtils.getFlagDaYu(elast1.getDif(), elast0.getDif())
+                && computeUtils.getFlagDaYu(elast1.getDif(), elast2.getDif())
+                && computeUtils.getFlagDaYu(elast1.getDif(), elast3.getDif())
+                && computeUtils.getFlagDaYu(elast1.getDif(), elast4.getDif())
+        ) {
+            poleType2 = 2;
+        }
+//        else if (computeUtils.getFlagDaYu(elast1.getDif(), elast2.getDif()) &&
+//                computeUtils.getFlagDaYu(elast0.getDif(), elast2.getDif())) {
+//            poleType2 = 1;
+//        }
+        //顶背离
+        if (poleType2 == 2) {
+            //寻找第一个极点
+            for (int i = 0; i < list.size() - 11; i++) {
+                KlineUEntity e7 = list.get(i + 7);
+                KlineUEntity e6 = list.get(i + 6);
+                KlineUEntity e5 = list.get(i + 5);
+                KlineUEntity e4 = list.get(i + 4);
+                KlineUEntity e3 = list.get(i + 3);//第一个极点
+                KlineUEntity e2 = list.get(i + 2);
+                KlineUEntity e1 = list.get(i + 1);
+                KlineUEntity e0 = list.get(i);
+//                //e3的dif 极高点
+//                if (computeUtils.getFlagDaYu(e3.getDif(), e2.getDif()) &&
+//                        computeUtils.getFlagDaYu(e3.getDif(), e1.getDif()) &&
+//                        computeUtils.getFlagDaYu(e3.getDif(), e0.getDif()) &&
+//                        computeUtils.getFlagDaYu(e3.getDif(), e4.getDif()) &&
+//                        computeUtils.getFlagDaYu(e3.getDif(), e5.getDif()) &&
+//                        computeUtils.getFlagDaYu(e3.getDif(), e6.getDif())) {
+                if (e0.getDif() == null) {
+                    e0.setDif(e0.getClosePrice());
+                }
+                //e3的dif 极高点
+                if (computeUtils.getFlagDaYu(e3.getHighPrice(), e2.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e3.getHighPrice(), e1.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e3.getHighPrice(), e0.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e3.getHighPrice(), e4.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e3.getHighPrice(), e5.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e3.getHighPrice(), e6.getHighPrice()) &&
+                        computeUtils.getFlagDaYu(e3.getHighPrice(), e7.getHighPrice())
+                        &&
+                        computeUtils.getFlagDaYu(e3.getDif(), e2.getDif()) &&
+                        computeUtils.getFlagDaYu(e3.getDif(), e1.getDif()) &&
+                        computeUtils.getFlagDaYu(e3.getDif(), e0.getDif()) &&
+                        computeUtils.getFlagDaYu(e3.getDif(), e4.getDif()) &&
+                        computeUtils.getFlagDaYu(e3.getDif(), e5.getDif()) &&
+                        computeUtils.getFlagDaYu(e3.getDif(), e6.getDif()) &&
+                        computeUtils.getFlagDaYu(e3.getDif(), e7.getDif())
+                ) {
+                    Long l1 = e3.getOpenTime().getTime();
+                    Long l2 = elast1.getOpenTime().getTime();
+                    long diff = (l2 - l1) / (60000);
+
+                    if (computeUtils.getFlagDaYu(e3.getDif(), elast1.getDif())
+                            && computeUtils.getFlagDaYu(elast1.getHighPrice(), e3.getHighPrice())
+                            && diff > 15
+                            && computeUtils.getFlagDaYu(elast1.getVolumeMoney(), elast2.getVolumeMoney())
+                            && computeUtils.getFlagDaYu(elast2.getVolumeMoney(), elast3.getVolumeMoney())
+                    ) {
+
+                        //出现顶背离
+                        dto.setSymbol(e3.getSymbol());
+                        dto.setType("顶背离");
+                        //String percent = computeUtils.getPercent(list.get(list.size() - 1).getClosePrice(), elast0.getClosePrice());
+//                        dto.setPercent(percent);
+//                        System.out.println("第一个点时间：" + computeUtils.dateToString(e3.getOpenTime())
+//                                + ",第二个点时间：" + computeUtils.dateToString(elast1.getOpenTime()));
+                    }
+                }
+            }
+        }
 
 
-
-
+        return dto;
+    }
 }
